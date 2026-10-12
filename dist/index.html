@@ -3,47 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#251a12" />
+    <meta name="theme-color" content="#173226" />
     <title>Atwood — Beer Counter</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap");
 
-      :root { color-scheme: dark; font-family: "DM Mono", monospace; background: #251a12; color: #fbf2df; }
+      :root { color-scheme: dark; font-family: "DM Mono", monospace; background: #173226; color: #f5edda; }
       * { box-sizing: border-box; }
-      body { min-height: 100svh; margin: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 18%, #5a3918 0, #251a12 45%, #17100c 100%); }
+      body { min-height: 100svh; margin: 0; display: grid; place-items: center; background: #173226; }
       main { width: min(100% - 40px, 640px); text-align: center; }
-      .brand { margin: 0 0 48px; letter-spacing: .19em; font-size: 11px; text-transform: uppercase; color: #d8bd86; }
-      .counter { border-top: 1px solid #b67a21; border-bottom: 1px solid #b67a21; padding: 44px 12px 48px; }
-      .label { display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: .13em; text-transform: uppercase; color: #d8bd86; }
-      output { display: block; font: normal clamp(130px, 31vw, 215px)/.8 "DM Serif Display", Georgia, serif; letter-spacing: -.075em; color: #f1a825; text-shadow: 0 4px 0 #71420d; }
-      .unit { margin: 22px 0 0; font: italic 25px/1 "DM Serif Display", Georgia, serif; }
+      .mark { width: 78px; margin: 0 auto 9px; color: #d59a39; }
+      .mark svg { display: block; width: 100%; height: auto; }
+      h1 { margin: 0 0 42px; color: #f5edda; font: normal 44px/1 "DM Serif Display", Georgia, serif; letter-spacing: -.04em; }
+      .counter { border-top: 1px solid #9d723d; border-bottom: 1px solid #9d723d; padding: 44px 12px 48px; }
+      .label { display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: .13em; text-transform: uppercase; color: #d5bb86; }
+      output { display: block; font: normal clamp(130px, 31vw, 215px)/.8 "DM Serif Display", Georgia, serif; letter-spacing: -.075em; color: #d59a39; text-shadow: 0 4px 0 #765127; }
       button { font: 500 12px "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
-      #open { margin-top: 39px; padding: 15px 21px; border: 1px solid #f1a825; border-radius: 3px; color: #251a12; background: #f1a825; transition: transform .15s, background .15s; }
-      #open:hover, #open:focus-visible { transform: translateY(-2px); background: #ffbd43; }
-      .note { margin: 24px 0 0; font-size: 10px; color: #a8916f; }
-      dialog { width: min(calc(100% - 40px), 370px); padding: 0; color: #fbf2df; border: 1px solid #b67a21; border-radius: 5px; background: #2f2117; box-shadow: 0 24px 80px #000; }
+      #open { margin-top: 39px; padding: 15px 21px; border: 1px solid #d59a39; border-radius: 3px; color: #173226; background: #d59a39; transition: transform .15s, background .15s; }
+      #open:hover, #open:focus-visible { transform: translateY(-2px); background: #f0bd62; }
+      dialog { width: min(calc(100% - 40px), 370px); padding: 0; color: #f5edda; border: 1px solid #9d723d; border-radius: 5px; background: #244231; box-shadow: 0 24px 80px #000; }
       dialog::backdrop { background: rgb(0 0 0 / .65); backdrop-filter: blur(3px); }
       form { padding: 28px; text-align: left; }
       h2 { margin: 0 0 25px; font: normal 32px/1 "DM Serif Display", Georgia, serif; }
-      label { display: block; margin: 16px 0 7px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #d8bd86; }
-      input { width: 100%; padding: 12px; color: #fbf2df; border: 1px solid #705637; border-radius: 2px; background: #1e150f; font: 16px "DM Mono", monospace; }
-      input:focus { outline: 2px solid #f1a825; outline-offset: 2px; }
+      label { display: block; margin: 16px 0 7px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #d5bb86; }
+      input { width: 100%; padding: 12px; color: #f5edda; border: 1px solid #6b7753; border-radius: 2px; background: #173226; font: 16px "DM Mono", monospace; }
+      input:focus { outline: 2px solid #d59a39; outline-offset: 2px; }
       .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 27px; }
-      .actions button { padding: 11px 13px; border: 1px solid #705637; border-radius: 2px; color: #fbf2df; background: transparent; }
-      .actions button[type="submit"] { border-color: #f1a825; color: #251a12; background: #f1a825; }
+      .actions button { padding: 11px 13px; border: 1px solid #6b7753; border-radius: 2px; color: #f5edda; background: transparent; }
+      .actions button[type="submit"] { border-color: #d59a39; color: #173226; background: #d59a39; }
       #error { min-height: 15px; margin: 13px 0 0; color: #ff9c83; font-size: 11px; }
     </style>
   </head>
   <body>
     <main>
-      <p class="brand">Atwood Beer Club</p>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 78 50" fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="2">
+          <path d="M12 43V25m0-18 9 18H3L12 7Zm27 36V17m0-12 12 21H27L39 5Zm27 38V27m0-17 10 17H56L66 10Z" />
+          <path d="M3 44h72" />
+        </svg>
+      </div>
+      <h1>atwood</h1>
       <section class="counter" aria-labelledby="counter-label">
         <span class="label" id="counter-label">Beers enjoyed</span>
         <output id="count" aria-live="polite">0</output>
-        <p class="unit">cold ones and counting</p>
       </section>
       <button id="open" type="button">Add some beers</button>
-      <p class="note">Keep it frosty.</p>
     </main>
 
     <dialog id="add-dialog" aria-labelledby="dialog-title">
