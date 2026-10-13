@@ -82,6 +82,7 @@
 
     <script type="module">
       import { CountUp } from "countup.js";
+      import { createClient } from "@supabase/supabase-js";
 
       const count = document.querySelector("#count");
       const dialog = document.querySelector("#add-dialog");
@@ -91,11 +92,13 @@
       const error = document.querySelector("#error");
       const beerSplash = document.querySelector("#beer-splash");
       const beerFlight = document.querySelector("#beer-flight");
-      const storageKey = "atwood-beer-count";
+      const submit = form.querySelector('button[type="submit"]');
+      const supabase = createClient(
+        "https://ubmphraqynrxcxmvgwab.supabase.co",
+        "sb_publishable_gKvWqXzJydEsFqcs1jNCjQ_4ToMdIsC",
+      );
       const celebration = "flight";
-
-      const savedCount = Number(localStorage.getItem(storageKey));
-      let beers = Number.isSafeInteger(savedCount) && savedCount >= 0 ? savedCount : 0;
+      let beers = 0;
 
       function showBeerSplash() {
         if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -135,7 +138,32 @@
         counter.start(() => count.setAttribute("aria-live", "polite"));
       }
 
-      animateCount(beers);
+      async function loadCount() {
+        const { data, error: loadError } = await supabase
+          .from("beer_counter")
+          .select("total")
+          .eq("id", 1)
+          .single();
+
+        if (loadError || !Number.isSafeInteger(Number(data?.total))) return;
+        beers = Number(data.total);
+        animateCount(beers);
+      }
+
+      loadCount();
+
+      supabase
+        .channel("atwood-beer-counter")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "beer_counter", filter: "id=eq.1" },
+          ({ new: next }) => {
+            if (!Number.isSafeInteger(Number(next.total))) return;
+            beers = Number(next.total);
+            count.textContent = beers;
+          },
+        )
+        .subscribe();
 
       document.querySelector("#open").addEventListener("click", () => {
         form.reset();
@@ -144,7 +172,7 @@
         amount.focus();
       });
       document.querySelector("#cancel").addEventListener("click", () => dialog.close());
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const added = Number(amount.value);
         if (password.value !== "beer") {
@@ -157,8 +185,18 @@
           amount.focus();
           return;
         }
-        beers += added;
-        localStorage.setItem(storageKey, beers);
+        submit.disabled = true;
+        const { data, error: addError } = await supabase.functions.invoke("beer-counter", {
+          body: { amount: added, password: password.value },
+        });
+        submit.disabled = false;
+
+        if (addError || !Number.isSafeInteger(Number(data?.total))) {
+          error.textContent = data?.error ?? "Could not add those beers. Try again.";
+          return;
+        }
+
+        beers = Number(data.total);
         count.textContent = beers;
         dialog.close();
         if (celebration === "splash") showBeerSplash();
