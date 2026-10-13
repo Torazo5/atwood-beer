@@ -1,0 +1,14 @@
+{
+  "name": "atwood-beer-tracker",
+  "private": true,
+  "scripts": {
+    "dev": "vite dist",
+    "build": "vite build dist --outDir ../build --emptyOutDir"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "countup.js": "^2.10.1"
+  }
+}
